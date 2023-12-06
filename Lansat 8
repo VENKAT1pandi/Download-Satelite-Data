@@ -1,0 +1,21 @@
+// 1. Load Landsat 8
+var image = ee.ImageCollection("LANDSAT/LC08/C01/T1_SR")
+.filterDate('2017-01-01', '2017-12-31')
+.filterBounds(roi)
+.sort('CLOUD_COVER')
+.first();
+
+// 2. Define the visialization parameter for the Landsat 8 image
+var visPaaramsTrue = {bands: ['B4', 'B3', 'B2'], min: 0, max:3000, gamma: 1.4};
+Map.addLayer(image, visPaaramsTrue, 'Landsat 2017');
+Map.addLayer(image.clip(roi), visPaaramsTrue, 'Landsat 2017 SA');
+Map.centerObject(roi, 10);
+
+// 3. Export to Drive
+Export.image.toDrive({
+  image: image.int16(),
+  description: 'Landsat2017Chennai',
+  scale: 30,
+  region: roi,
+  maxPixels: 1e13
+});
